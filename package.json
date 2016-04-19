@@ -1,0 +1,31 @@
+{
+  "name": "rollup-plugin-css",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "js:next": "src.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "rollup -i src.js -f cjs -o index.js",
+    "deploy": "git add . && git commit -am 'fix' && git push && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QiV/rollup-plugin-css.git"
+  },
+  "files": [ "index.js", "src.js" ],
+  "devDependencies": {
+    "rollup": "*",
+    "rollup-pluginutils": "*",
+    "postcss": "*",
+    "css-modules-loader-core": "*",
+    "glob": "*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/QiV/rollup-plugin-css/issues"
+  },
+  "homepage": "https://github.com/QiV/rollup-plugin-css#readme"
+}
