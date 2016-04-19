@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-css",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "js:next": "src.js",
@@ -14,12 +14,14 @@
     "url": "git+https://github.com/QiV/rollup-plugin-css.git"
   },
   "files": [ "index.js", "src.js" ],
-  "devDependencies": {
-    "rollup": "*",
+  "dependencies": {
     "rollup-pluginutils": "*",
     "postcss": "*",
     "css-modules-loader-core": "*",
     "glob": "*"
+  },
+  "devDependencies": {
+    "rollup": "*"
   },
   "keywords": [],
   "author": "",
