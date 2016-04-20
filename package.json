@@ -6,7 +6,7 @@
   "js:next": "src.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rollup -i src.js -f cjs -o index.js",
+    "start": "rollup -i src.js -f cjs | babel --presets=babel-preset-normal-please > index.js",
     "deploy": "git add . && git commit -am 'fix' && git push && npm publish"
   },
   "repository": {
@@ -21,7 +21,9 @@
     "glob": "*"
   },
   "devDependencies": {
-    "rollup": "*"
+    "rollup": "*",
+    "babel-cli": "*",
+    "babel-preset-normal-please": "*"
   },
   "keywords": [],
   "author": "",

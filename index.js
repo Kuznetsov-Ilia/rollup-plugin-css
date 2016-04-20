@@ -1,6 +1,8 @@
 'use strict';
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+function _interopDefault(ex) {
+  return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
+}
 
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
@@ -14,19 +16,21 @@ function pathJoin(file) {
   return path.join(process.cwd(), file);
 }
 var cssfile = [];
-const cached = {};
+var cached = {};
 var trace = 0;
-const cssModules = new CssModules();
-function src (options = {}) {
-  const filter = rollupPluginutils.createFilter(options.include, options.exclude);
+var cssModules = new CssModules();
+function src() {
+  var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+  var filter = rollupPluginutils.createFilter(options.include, options.exclude);
   /*const outputFile = typeof options.output === 'string';
   const outputFunction = typeof options.output === 'function';*/
   return {
-    transform(source, id) {
+    transform: function transform(source, id) {
       if (!filter(id)) {
         return null;
       }
-      const opts = {
+      var opts = {
         from: options.from ? pathJoin(options.from) : id,
         to: options.to ? pathJoin(options.to) : id,
         map: {
@@ -34,52 +38,48 @@ function src (options = {}) {
           annotation: false
         }
       };
-      const relativePath = path.relative(process.cwd(), id);
+      var relativePath = path.relative(process.cwd(), id);
       //console.log('relativePath', relativePath);
       trace++;
-      var cache = (res) => {
+      var cache = function cache(res) {
         cached[relativePath] = res;
         cssfile.push(res.injectableSource);
         return res;
       };
-      return postcss(options.plugins || [])
-        .process(source, opts)
-        .then(({ css, map }) => cssModules
-          .load(css, relativePath, trace, pathFetcher)
-          .then(cache)
-          .then(({ exportTokens }) => ({
-              code: getExports(exportTokens),
-              map: options.sourceMap && map ? JSON.parse(map) : {mappings: ''}
-            }))
-          //.then(res => {console.log(res);return res;})
-        )
-        /*.then(r => {
-                  if (outputFile) {
-                    fs.writeFile(options.output, cssfile.join(''));
-                  } else if (outputFunction) {
-                    options.output(cssfile.join('\n'));
-                  }
-                  return r;
-                })*/
+      return postcss(options.plugins || []).process(source, opts).then(function (_ref) {
+        var css = _ref.css;
+        var map = _ref.map;
+        return cssModules.load(css, relativePath, trace, pathFetcher).then(cache).then(function (_ref2) {
+          var exportTokens = _ref2.exportTokens;
+          return {
+            code: getExports(exportTokens),
+            map: options.sourceMap && map ? JSON.parse(map) : { mappings: '' }
+          };
+        });
+      }
+      //.then(res => {console.log(res);return res;})
+      )
+      /*.then(r => {
+                if (outputFile) {
+                  fs.writeFile(options.output, cssfile.join(''));
+                } else if (outputFunction) {
+                  options.output(cssfile.join('\n'));
+                }
+                return r;
+              })*/
       ;
     },
-    transformBundle() {
+    transformBundle: function transformBundle() {
       console.log('writing css to:', options.output);
       fs__default.writeFile(options.output, cssfile.join(''));
     }
   };
 }
 
-
-
 function getExports(exportTokens) {
-  return Object.keys(exportTokens)
-    .map(t => `var ${t}="${exportTokens[t]}"`)
-    .concat([
-      `export { ${Object.keys(exportTokens).join(',')} }`,
-      `export default ${JSON.stringify(exportTokens)}`
-    ])
-    .join(';\n');
+  return Object.keys(exportTokens).map(function (t) {
+    return 'var ' + t + '="' + exportTokens[t] + '"';
+  }).concat(['export { ' + Object.keys(exportTokens).join(',') + ' }', 'export default ' + JSON.stringify(exportTokens)]).join(';\n');
 }
 
 function pathFetcher(file, relativeTo, depTrace) {
@@ -87,10 +87,10 @@ function pathFetcher(file, relativeTo, depTrace) {
   file = file.replace(/^["']|["']$/g, '');
   if (file.startsWith('.')) {
     return Promise.reject('implement relative path bleat!');
-    let dir = path.dirname(relativeTo);
-    let sourcePath = glob.sync(path.join(dir, file))[0];
-    console.log('sourcePath', sourcePath);
-    if (!sourcePath) {
+    var dir = path.dirname(relativeTo);
+    var _sourcePath = glob.sync(path.join(dir, file))[0];
+    console.log('sourcePath', _sourcePath);
+    if (!_sourcePath) {
       console.error('no sourcePath', dir, file);
       /*this._options.paths.some(dir => {
         return sourcePath = glob.sync(join(dir, file))[0]
@@ -106,30 +106,28 @@ function pathFetcher(file, relativeTo, depTrace) {
       })
     }*/
   } else {
-    sourcePath = `node_modules/${file}`;
-    if (!file.endsWith('.css')) {
-      sourcePath += '.css';
+      sourcePath = 'node_modules/' + file;
+      if (!file.endsWith('.css')) {
+        sourcePath += '.css';
+      }
+      console.log('pathFetcher', sourcePath);
     }
-    console.log('pathFetcher', sourcePath);
-  }
-  return new Promise((resolve, reject) => {
-    let _cached = cached[sourcePath];
+  return new Promise(function (resolve, reject) {
+    var _cached = cached[sourcePath];
     if (_cached) {
       return resolve(_cached.exportTokens);
     }
-    fs.readFile(sourcePath, 'utf-8', (error, sourceString) => {
+    fs.readFile(sourcePath, 'utf-8', function (error, sourceString) {
       if (error) {
         return reject(error);
       }
-      cssModules
-        .load(sourceString, sourcePath, ++trace, pathFetcher)
-        .then(result => {
-          cached[sourcePath] = result;
-          resolve(result.exportTokens);
-        })
-        .catch(reject);
+      cssModules.load(sourceString, sourcePath, ++trace, pathFetcher).then(function (result) {
+        cached[sourcePath] = result;
+        resolve(result.exportTokens);
+      }).catch(reject);
     });
   });
 }
 
 module.exports = src;
+
