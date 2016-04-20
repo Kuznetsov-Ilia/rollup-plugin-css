@@ -70,7 +70,7 @@ function src() {
       ;
     },
     transformBundle: function transformBundle() {
-      console.log('writing css to:', options.output);
+      //console.log('writing css to:', options.output);
       fs__default.writeFile(options.output, cssfile.join(''));
     }
   };
@@ -89,7 +89,7 @@ function pathFetcher(file, relativeTo, depTrace) {
     return Promise.reject('implement relative path bleat!');
     var dir = path.dirname(relativeTo);
     var _sourcePath = glob.sync(path.join(dir, file))[0];
-    console.log('sourcePath', _sourcePath);
+    //console.log('sourcePath', sourcePath);
     if (!_sourcePath) {
       console.error('no sourcePath', dir, file);
       /*this._options.paths.some(dir => {
@@ -110,7 +110,7 @@ function pathFetcher(file, relativeTo, depTrace) {
       if (!file.endsWith('.css')) {
         sourcePath += '.css';
       }
-      console.log('pathFetcher', sourcePath);
+      //console.log('pathFetcher', sourcePath);
     }
   return new Promise(function (resolve, reject) {
     var _cached = cached[sourcePath];

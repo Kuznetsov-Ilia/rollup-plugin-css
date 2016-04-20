@@ -59,7 +59,7 @@ export default function (options = {}) {
       ;
     },
     transformBundle() {
-      console.log('writing css to:', options.output);
+      //console.log('writing css to:', options.output);
       fs.writeFile(options.output, cssfile.join(''));
     }
   };
@@ -84,7 +84,7 @@ function pathFetcher(file, relativeTo, depTrace) {
     return Promise.reject('implement relative path bleat!');
     let dir = dirname(relativeTo);
     let sourcePath = glob.sync(join(dir, file))[0];
-    console.log('sourcePath', sourcePath);
+    //console.log('sourcePath', sourcePath);
     if (!sourcePath) {
       console.error('no sourcePath', dir, file);
       /*this._options.paths.some(dir => {
@@ -105,7 +105,7 @@ function pathFetcher(file, relativeTo, depTrace) {
     if (!file.endsWith('.css')) {
       sourcePath += '.css';
     }
-    console.log('pathFetcher', sourcePath);
+    //console.log('pathFetcher', sourcePath);
   }
   return new Promise((resolve, reject) => {
     let _cached = cached[sourcePath];
