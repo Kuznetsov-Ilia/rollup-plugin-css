@@ -18,6 +18,45 @@ function pathJoin(file) {
 var cssfile = [];
 var cached = {};
 var trace = 0;
+function stringHash(str) {
+  var hash = 5381;
+  var i = str.length;
+
+  while (i) {
+    hash = hash * 33 ^ str.charCodeAt(--i);
+  }
+
+  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+   * integers. Since we want the results to be always positive, convert the
+   * signed int to an unsigned by doing an unsigned bitshift. */
+  return hash >>> 0;
+}
+
+/*function ff (){
+  var al = [65, 90];
+  var au = [97, 122];
+  for (var i=65, l=122; i <= l; i++) {
+    if (i > 90 && i < 97) {
+      i = 97;
+    }
+  }
+}*/
+
+CssModules.scope.generateScopedName = function (name, filename, css) {
+  var executed = new RegExp(name + '[^{]*{([^}]*)}').exec(css);
+  var rule;
+  if (executed && executed[1]) {
+    rule = executed[1];
+  } else {
+    console.error('name', name, 'filename', filename, 'css', css);
+  }
+  var hash = stringHash(rule).toString(36).substr(0, 5);
+  if (hash[0] == Number(hash[0])) {
+    hash = '_' + hash;
+  }
+  return hash;
+};
+
 var cssModules = new CssModules();
 function src() {
   var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
