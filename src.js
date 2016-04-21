@@ -43,7 +43,7 @@ CssModules.scope.generateScopedName = function(name, filename, css) {
   } else {
     console.error('name', name, 'filename', filename, 'css', css);  
   }
-  var hash = stringHash(rule).toString(36).substr(0, 5);
+  var hash = stringHash(rule).toString(36);//.substr(0, 5);
   if (hash[0] == Number(hash[0])) {
     hash = '_' + hash;
   }
