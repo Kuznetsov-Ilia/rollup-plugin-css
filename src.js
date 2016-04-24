@@ -24,63 +24,49 @@ function stringHash(str) {
    * signed int to an unsigned by doing an unsigned bitshift. */
   return hash >>> 0;
 }
-var START_CODE = 65;
-var END_CODE = 122;
-var CURRENT_NAME = '';
-var PREFIX = '';
-//var STACK_CODE = [];
-// a
-// b
-// c
-// aa
-// ab
-// ac
-/*var NameSequence = '_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-function getNextName () {
-  if (PREFIX.length === 0) {
-    CURRENT_NAME = NameSequence[POS];
-    while (CURRENT_NAME == Number(CURRENT_NAME)) {
-      CURRENT_NAME = NameSequence[++POS];
-    }
-  } else if (PREFIX.length === 1) {
-    if (PREFIX === '-') {
-      CURRENT_NAME = NameSequence[POS];
-      while (CURRENT_NAME == Number(CURRENT_NAME) || CURRENT_NAME === '-') {
-        CURRENT_NAME = NameSequence[++POS];
-      }
+/*function ff (){
+  var al = [65, 90];
+  var au = [97, 122];
+  for (var i=65, l=122; i <= l; i++) {
+    if (i > 90 && i < 97) {
+      i = 97;
     }
   }
-  if (CURRENT_NAME === NameSequence[NameSequence.length-1]) {// last
-    if (PREFIX === '') {
-      PREFIX = CURRENT_NAME;
-    } else {
-      var i = NameSequence.indexOf(PREFIX);
-      if (++i > NameSequence.length) {
-        PREFIX += CURRENT_NAME
-      }
-    }
-  }
-
-
-  CURRENT_NAME = String.fromCharCode(CURRENT_CODE);
-  return CURRENT_NAME;
 }*/
 
-CssModules.scope.generateScopedName = function(name, filename, css) {
-  var executed = new RegExp(`${name}[^\{]*\{([^\}]*)\}`).exec(css);
-  var rule;
-  if (executed && executed[1]) {
-    rule = executed[1];
-  } else {
-    console.error('name', name, 'filename', filename, 'css', css);  
-  }
-  var hash = stringHash(rule).toString(36);//.substr(0, 5);
+var HASHES = {};
+CssModules.scope.generateScopedName = function (name, filename, css) {
+  var hash = stringHash([name, filename, css].join('-')).toString(36);
   if (hash[0] == Number(hash[0])) {
     hash = '_' + hash;
   }
+  return hash; 
+  var hash;
+  var matches = css.match(new RegExp(`\\.${name}`, 'g'));
+  //console.error('name', name, 'matches', matches.length, new RegExp(`\.${name}`));
+  if (matches.length > 1) {
+    hash = stringHash([name, filename, css].join('-')).toString(36);
+  } else {
+    var reg = new RegExp(`\\.${name}[^\\{]*\\{([^\\}]*)\\}`);
+    var executed = reg.exec(css);
+    var rule;
+    if (executed && executed[1]) {
+      rule = executed[1];
+    } else {
+      rule = css;
+      console.error('not matched selector', reg, 'name', name, 'filename', filename, 'css', css);
+    }
+    //console.error('\n-------\nname: ', name, '\nreg:', reg, '\nexec:', executed, '\nfilename: ', filename, '\nrule: ', rule, '\ncss: \n', css, '\n');
+    hash = stringHash(rule).toString(36);
+    if (hash[0] == Number(hash[0])) {
+      hash = '_' + hash;
+    }
+  }
+  
+  //return '';
   return hash;
-}
+};
 
 const cssModules = new CssModules();
 export default function (options = {}) {
