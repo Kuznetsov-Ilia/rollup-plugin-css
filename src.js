@@ -5,66 +5,19 @@ import CssModules from 'css-modules-loader-core';
 import { join, dirname, relative } from 'path';
 import { /*writeFile,*/ readFile } from 'fs';
 import glob from 'glob';
+import {toRadix, stringHash} from 'my-util';
 function pathJoin(file) {
   return join(process.cwd(), file);
 }
 var cssfile = [];
 const cached = {};
 var trace = 0;
-function stringHash(str) {
-  var hash = 5381;
-  var i = str.length;
-
-  while(i) {
-    hash = (hash * 33) ^ str.charCodeAt(--i);
-  }
-
-  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
-   * integers. Since we want the results to be always positive, convert the
-   * signed int to an unsigned by doing an unsigned bitshift. */
-  return hash >>> 0;
-}
-
-/*function ff (){
-  var al = [65, 90];
-  var au = [97, 122];
-  for (var i=65, l=122; i <= l; i++) {
-    if (i > 90 && i < 97) {
-      i = 97;
-    }
-  }
-}*/
-
-var HASHES = {};
 CssModules.scope.generateScopedName = function (name, filename, css) {
-  var hash = stringHash([name, filename, css].join('-')).toString(36);
+  var pathName = filename.split('/').slice(2, -1).concat([name]).join('-');
+  var hash = toRadix(stringHash(pathName), 64);
   if (hash[0] == Number(hash[0])) {
     hash = '_' + hash;
   }
-  return hash; 
-  var hash;
-  var matches = css.match(new RegExp(`\\.${name}`, 'g'));
-  //console.error('name', name, 'matches', matches.length, new RegExp(`\.${name}`));
-  if (matches.length > 1) {
-    hash = stringHash([name, filename, css].join('-')).toString(36);
-  } else {
-    var reg = new RegExp(`\\.${name}[^\\{]*\\{([^\\}]*)\\}`);
-    var executed = reg.exec(css);
-    var rule;
-    if (executed && executed[1]) {
-      rule = executed[1];
-    } else {
-      rule = css;
-      console.error('not matched selector', reg, 'name', name, 'filename', filename, 'css', css);
-    }
-    //console.error('\n-------\nname: ', name, '\nreg:', reg, '\nexec:', executed, '\nfilename: ', filename, '\nrule: ', rule, '\ncss: \n', css, '\n');
-    hash = stringHash(rule).toString(36);
-    if (hash[0] == Number(hash[0])) {
-      hash = '_' + hash;
-    }
-  }
-  
-  //return '';
   return hash;
 };
 

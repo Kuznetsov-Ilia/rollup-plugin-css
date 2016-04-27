@@ -11,6 +11,7 @@ var postcss = _interopDefault(require('postcss'));
 var CssModules = _interopDefault(require('css-modules-loader-core'));
 var path = require('path');
 var glob = _interopDefault(require('glob'));
+var myUtil = require('my-util');
 
 function pathJoin(file) {
   return path.join(process.cwd(), file);
@@ -18,49 +19,12 @@ function pathJoin(file) {
 var cssfile = [];
 var cached = {};
 var trace = 0;
-function stringHash(str) {
-  var hash = 5381;
-  var i = str.length;
-
-  while (i) {
-    hash = hash * 33 ^ str.charCodeAt(--i);
-  }
-
-  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
-   * integers. Since we want the results to be always positive, convert the
-   * signed int to an unsigned by doing an unsigned bitshift. */
-  return hash >>> 0;
-}
-
 CssModules.scope.generateScopedName = function (name, filename, css) {
-  var hash = stringHash([name, filename, css].join('-')).toString(36);
+  var pathName = filename.split('/').slice(2, -1).concat([name]).join('-');
+  var hash = myUtil.toRadix(myUtil.stringHash(pathName), 64);
   if (hash[0] == Number(hash[0])) {
     hash = '_' + hash;
   }
-  return hash;
-  var hash;
-  var matches = css.match(new RegExp('\\.' + name, 'g'));
-  //console.error('name', name, 'matches', matches.length, new RegExp(`\.${name}`));
-  if (matches.length > 1) {
-    hash = stringHash([name, filename, css].join('-')).toString(36);
-  } else {
-    var reg = new RegExp('\\.' + name + '[^\\{]*\\{([^\\}]*)\\}');
-    var executed = reg.exec(css);
-    var rule;
-    if (executed && executed[1]) {
-      rule = executed[1];
-    } else {
-      rule = css;
-      console.error('not matched selector', reg, 'name', name, 'filename', filename, 'css', css);
-    }
-    //console.error('\n-------\nname: ', name, '\nreg:', reg, '\nexec:', executed, '\nfilename: ', filename, '\nrule: ', rule, '\ncss: \n', css, '\n');
-    hash = stringHash(rule).toString(36);
-    if (hash[0] == Number(hash[0])) {
-      hash = '_' + hash;
-    }
-  }
-
-  //return '';
   return hash;
 };
 
