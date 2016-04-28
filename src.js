@@ -5,7 +5,37 @@ import CssModules from 'css-modules-loader-core';
 import { join, dirname, relative } from 'path';
 import { /*writeFile,*/ readFile } from 'fs';
 import glob from 'glob';
-import {toRadix, stringHash} from 'my-util';
+//import {toRadix, stringHash} from 'my-util';
+
+function toRadix(N,radix) {
+  var HexN = '';
+  var Q=Math.floor(Math.abs(N));
+  var R;
+  while (true) {
+    R = Q % radix;
+    HexN = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'.charAt(R) + HexN;
+    Q = (Q - R) / radix; 
+    if (Q === 0) {
+      break;
+    }
+  }
+  return ((N < 0) ? '-' + HexN : HexN);
+}
+
+
+function stringHash(str) {
+  var hash = 5381;
+  var i = str.length;
+  while(i) {
+    hash = (hash * 33) ^ str.charCodeAt(--i);
+  }
+  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+   * integers. Since we want the results to be always positive, convert the
+   * signed int to an unsigned by doing an unsigned bitshift. */
+  return hash >>> 0;
+}
+
+
 function pathJoin(file) {
   return join(process.cwd(), file);
 }

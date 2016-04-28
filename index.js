@@ -11,7 +11,35 @@ var postcss = _interopDefault(require('postcss'));
 var CssModules = _interopDefault(require('css-modules-loader-core'));
 var path = require('path');
 var glob = _interopDefault(require('glob'));
-var myUtil = require('my-util');
+
+//import {toRadix, stringHash} from 'my-util';
+
+function toRadix(N, radix) {
+  var HexN = '';
+  var Q = Math.floor(Math.abs(N));
+  var R;
+  while (true) {
+    R = Q % radix;
+    HexN = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'.charAt(R) + HexN;
+    Q = (Q - R) / radix;
+    if (Q === 0) {
+      break;
+    }
+  }
+  return N < 0 ? '-' + HexN : HexN;
+}
+
+function stringHash(str) {
+  var hash = 5381;
+  var i = str.length;
+  while (i) {
+    hash = hash * 33 ^ str.charCodeAt(--i);
+  }
+  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+   * integers. Since we want the results to be always positive, convert the
+   * signed int to an unsigned by doing an unsigned bitshift. */
+  return hash >>> 0;
+}
 
 function pathJoin(file) {
   return path.join(process.cwd(), file);
@@ -21,7 +49,7 @@ var cached = {};
 var trace = 0;
 CssModules.scope.generateScopedName = function (name, filename, css) {
   var pathName = filename.split('/').slice(2, -1).concat([name]).join('-');
-  var hash = myUtil.toRadix(myUtil.stringHash(pathName), 64);
+  var hash = toRadix(stringHash(pathName), 64);
   if (hash[0] == Number(hash[0])) {
     hash = '_' + hash;
   }
