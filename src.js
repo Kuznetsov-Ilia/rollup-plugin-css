@@ -5,36 +5,7 @@ import CssModules from 'css-modules-loader-core';
 import { join, dirname, relative } from 'path';
 import { /*writeFile,*/ readFile } from 'fs';
 import glob from 'glob';
-//import {toRadix, stringHash} from 'my-util';
-
-function toRadix(N,radix) {
-  var HexN = '';
-  var Q=Math.floor(Math.abs(N));
-  var R;
-  while (true) {
-    R = Q % radix;
-    HexN = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'.charAt(R) + HexN;
-    Q = (Q - R) / radix; 
-    if (Q === 0) {
-      break;
-    }
-  }
-  return ((N < 0) ? '-' + HexN : HexN);
-}
-
-
-function stringHash(str) {
-  var hash = 5381;
-  var i = str.length;
-  while(i) {
-    hash = (hash * 33) ^ str.charCodeAt(--i);
-  }
-  /* JavaScript does bitwise operations (like XOR, above) on 32-bit signed
-   * integers. Since we want the results to be always positive, convert the
-   * signed int to an unsigned by doing an unsigned bitshift. */
-  return hash >>> 0;
-}
-
+import {toRadix, stringHash} from 'my-util';
 
 function pathJoin(file) {
   return join(process.cwd(), file);
@@ -54,8 +25,6 @@ CssModules.scope.generateScopedName = function (name, filename, css) {
 const cssModules = new CssModules();
 export default function (options = {}) {
   const filter = createFilter(options.include, options.exclude);
-  /*const outputFile = typeof options.output === 'string';
-  const outputFunction = typeof options.output === 'function';*/
   return {
     transform(source, id) {
       if (!filter(id)) {
@@ -70,7 +39,6 @@ export default function (options = {}) {
         }
       };
       const relativePath = relative(process.cwd(), id);
-      //console.log('relativePath', relativePath);
       trace++;
       var cache = (res) => {
         cached[relativePath] = res;
@@ -86,21 +54,14 @@ export default function (options = {}) {
               code: getExports(exportTokens),
               map: options.sourceMap && map ? JSON.parse(map) : {mappings: ''}
             }))
-          //.then(res => {console.log(res);return res;})
         )
-        /*.then(r => {
-                  if (outputFile) {
-                    fs.writeFile(options.output, cssfile.join(''));
-                  } else if (outputFunction) {
-                    options.output(cssfile.join('\n'));
-                  }
-                  return r;
-                })*/
-      ;
     },
     transformBundle() {
-      //console.log('writing css to:', options.output);
-      fs.writeFile(options.output, cssfile.join(''));
+      var output = cssfile.join('');
+      if (typeof options.post === 'function') {
+        output = options.post(output);
+      }
+      fs.writeFile(options.output, output);
     }
   };
 }
@@ -124,28 +85,14 @@ function pathFetcher(file, relativeTo, depTrace) {
     return Promise.reject('implement relative path bleat!');
     let dir = dirname(relativeTo);
     let sourcePath = glob.sync(join(dir, file))[0];
-    //console.log('sourcePath', sourcePath);
     if (!sourcePath) {
       console.error('no sourcePath', dir, file);
-      /*this._options.paths.some(dir => {
-        return sourcePath = glob.sync(join(dir, file))[0]
-      })*/
     }
-    /*if (!sourcePath) {
-      return new Promise((resolve, reject) => {
-        let errorMsg = `Not Found : ${file}  from ${dir}`;
-        if (this._options.paths.length) {
-          errorMsg += " and " + this._options.paths.join(" ")
-        }
-        reject(errorMsg)
-      })
-    }*/
   } else {
     sourcePath = `node_modules/${file}`;
     if (!file.endsWith('.css')) {
       sourcePath += '.css';
     }
-    //console.log('pathFetcher', sourcePath);
   }
   return new Promise((resolve, reject) => {
     let _cached = cached[sourcePath];
