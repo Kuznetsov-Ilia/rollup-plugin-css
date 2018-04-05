@@ -1,19 +1,19 @@
 {
   "name": "rollup-plugin-css",
-  "version": "1.0.10",
+  "version": "2.0.11",
   "description": "",
   "main": "index.js",
-  "js:next": "src.js",
+  "js:next": "index.es",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "rollup -i src.js -f cjs | babel --presets=babel-preset-normal-please > index.js",
+    "start": "rollup -i index.es -f cjs | babel --presets=babel-preset-normal-please > index.js",
     "deploy": "git add . && git commit -am 'fix' && git push && npm publish"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/QiV/rollup-plugin-css.git"
   },
-  "files": [ "index.js", "src.js" ],
+  "files": [ "index.js", "index.es" ],
   "dependencies": {
     "rollup-pluginutils": "*",
     "postcss": "*",

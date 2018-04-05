@@ -42,7 +42,7 @@ export default function (options = {}) {
       trace++;
       var cache = (res) => {
         cached[relativePath] = res;
-        cssfile.push(res.injectableSource);
+        cssfile.push(cssfile.push(`/* ${relativePath} */\n ${res.injectableSource}`));
         return res;
       };
       return postcss(options.plugins || [])
